@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image Annotation Boilerplate</title>
+  <style>
+    :root{
+      --accent: #2563eb; /* tweak color */
+      --label-bg: rgba(17,24,39,0.85);
+      --label-text: #fff;
+      --ring: rgba(37,99,235,0.25);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:#0b1020; color:#e5e7eb; }
+    .container { min-height: 100svh; display:flex; align-items:center; justify-content:center; padding:12px; }
+
+    figure.annotator { position: relative; max-width: 1000px; width: min(100%, 1000px); margin: 0; }
+    .annotator img { width: 100%; height: auto; display: block; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.45); }
+
+    /* Overlay holds SVG lines and hotspot buttons */
+    .overlay { position: absolute; inset: 0; pointer-events: none; }
+
+    /* Hotspots */
+    .hotspot { position: absolute; width: 8px; height: 12px; border-radius: 999px; background: var(--accent); border: 2px solid white; transform: translate(-50%, -50%); box-shadow: 0 6px 20px var(--ring); cursor: pointer; pointer-events: auto; }
+    .hotspot:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+
+    /* Labels */
+    .label { position: absolute; transform: translate(-50%, -100%); background: var(--label-bg); color: var(--label-text); padding: 8px 10px; border-radius: 10px; font-size: 14px; line-height: 1.2; max-width: 220px; width: max-content; box-shadow: 0 6px 24px rgba(0,0,0,0.35); opacity: 0; translate: 0 6px; transition: opacity .18s ease, translate .18s ease; pointer-events: none; }
+    .label b { display:block; font-size: 12px; letter-spacing:.02em; text-transform: uppercase; opacity: .8; margin-bottom: 4px; }
+    .label::after { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--label-bg); }
+
+    /* Show label on hover/focus */
+    .hotspot:is(:hover, :focus-visible) + .label,
+    .label[data-open="true"] { opacity: 1; translate: 0 0; pointer-events: auto; }
+
+    /* Utility: position labels with an offset if needed */
+    .label[data-offset="right"] { transform: translate(12px, -50%); }
+    .label[data-offset="left"] { transform: translate(-100%, -50%); }
+
+    /* Legend */
+    .legend { margin-top: 14px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center; font-size: 13px; opacity:.8; }
+    .dot { width:10px; height:10px; background:var(--accent); border-radius:999px; border:2px solid white; box-shadow: 0 0 0 4px var(--ring); }
+
+    /* Small screens */
+    @media (max-width: 520px) {
+      .label { font-size: 13px; max-width: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <figure class="annotator" aria-label="Annotated image demo">
+      <!-- Replace the image src with your own -->
+      <img src="https://cdn.shopify.com/s/files/1/0416/1116/5847/files/14th_1_DL.jpg" alt="City skyline at dusk" />
+
+      <!-- SVG lines/arrows overlay (scales with image) 
+      <svg class="overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)" />
+          </marker>
+        </defs>
+        <!-- Example connectors: use percentages in the 0..100 viewBox space 
+        <path d="M 30 35 C 35 28, 45 25, 52 24" fill="none" stroke="var(--accent)" stroke-width="0.6" marker-end="url(#arrow)" opacity="0.9" />
+        <path d="M 78 64 Q 69 62, 60 58" fill="none" stroke="var(--accent)" stroke-width="0.6" marker-end="url(#arrow)" opacity="0.9" />
+        <path d="M 22 75 Q 30 70, 40 67" fill="none" stroke="var(--accent)" stroke-width="0.6" marker-end="url(#arrow)" opacity="0.9" />
+      </svg-->
+
+      <!-- Hotspots & labels: positioned with CSS custom properties using % of image size -->
+      
+      <!-- Hotspot 1 -->
+      <button class="hotspot" style="--x:50%; --y:1%; left:var(--x); top:var(--y);" aria-label="Observation Deck"></button>
+      <figcaption class="label" style="--x:70%; --y:12%; left:var(--x); top:var(--y);" role="note">
+        <b>Vijaya</b>
+        Ushnishavijaya (Tibetan: tsug tor nam par gyal ma): goddess of long-life, white in colour, with three faces and eight hands.
+      </figcaption>
+
+      
+      <!-- Hotspot 1 -->
+      <button class="hotspot" style="--x:77%; --y:12%; left:var(--x); top:var(--y);" aria-label="Observation Deck"></button>
+      <figcaption class="label" style="--x:87%; --y:18%; left:var(--x); top:var(--y);" role="note">
+        <b>Buddha Amitayus</b>
+        Amitayus, Buddha (Tibetan: tse pag me. English: the Enlightened One of Immeasurable Life) Lord of Limitless Life and Pristine Awareness, in Sambhogakaya aspect (Enjoyment Body) of a Buddha.
+      </figcaption>
+
+      <!-- Hotspot 2 -->
+      <button class="hotspot" style="--x:77%; --y:28%; left:var(--x); top:var(--y);" aria-label="Riverfront"></button>
+      <figcaption class="label" style="--x:87%; --y:28%; left:var(--x); top:var(--y);" role="note" data-offset="left">
+        <b>Exile in India</b>
+        Pandit Nehru personally met the Dalai Lama in Mussoorie on 20 April 1959, where he formally welcomed him as a guest of the Government of India.
+      </figcaption>
+
+      <!-- Hotspot 3 -->
+      <button class="hotspot" style="--x:62%; --y:20%; left:var(--x); top:var(--y);" aria-label="Old Quarter"></button>
+      <figcaption class="label" style="--x:72%; --y:20%; left:var(--x); top:var(--y);" role="note" data-offset="right">
+        <b>1974 & 1985 Kālacakra initiation</b>
+He performed the Kālacakra initiation in Bodh Gaya during these years.
+      </figcaption>
+
+      <!-- The overlay div is above everything for pointer capture; kept empty on purpose -->
+      <div class="overlay" aria-hidden="true"></div>
+    </figure>
+  </div>
+
+  <div class="legend">
+    <span class="dot" aria-hidden="true"></span>
+    <span>Tap or hover markers to reveal labels • Keyboard: Tab to focus a marker</span>
+  </div>
+
+  <script>
+    // Accessible interactions: toggle labels on click for touch users
+    const hotspots = document.querySelectorAll('.hotspot');
+
+    hotspots.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = btn.nextElementSibling;
+        const open = next.getAttribute('data-open') === 'true';
+        // Close all labels first (like a radio group)
+        document.querySelectorAll('.label').forEach(l => l.setAttribute('data-open', 'false'));
+        next.setAttribute('data-open', !open);
+      });
+
+      // Optional: close labels when pressing Escape
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.label').forEach(l => l.setAttribute('data-open', 'false'));
+        }
+      });
+    });
+
+    // Click outside to close labels
+    document.addEventListener('click', (e) => {
+      const isHotspotOrLabel = e.target.closest('.hotspot, .label');
+      if (!isHotspotOrLabel) {
+        document.querySelectorAll('.label').forEach(l => l.setAttribute('data-open', 'false'));
+      }
+    });
+  </script>
+</body>
+</html>
+
